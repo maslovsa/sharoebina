@@ -41,9 +41,8 @@ void loop() {
 //  delay(200);
 //  digitalWrite(SysLed, LOW);
 //  delay(200);
-  
+//  
   wifiProcess();
-
 }
 
 ////////////////////
@@ -57,7 +56,7 @@ void wifiInit(void)
   webPage += "<p>Sys Led <a href=\"SysOn\"><button>ON</button></a>&nbsp;<a href=\"SysOff\"><button>OFF</button></a></p>";
 
   delay(1000);
-  Serial.println("");
+  Serial.println("INIT Sharoebina");
 
   // ждем соединения
   WiFi.begin(ssid, passw);
@@ -68,6 +67,7 @@ void wifiInit(void)
     delay(250);
     digitalWrite(SysLed, HIGH);
     delay(250);
+    Serial.print(".");
   }
 
 
@@ -141,8 +141,7 @@ void wifiInit(void)
   Serial.println("HTTP server started");
 }
 
-void wifiProcess(void)
-{
+void wifiProcess(void) {
   server.handleClient();
 }
 
