@@ -2,6 +2,7 @@
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
 #include <ESP8266mDNS.h>
+#include <ESP8266HTTPClient.h>
 
 #define SysLed 2
 #define LedR 15
@@ -10,9 +11,11 @@
 
 MDNSResponder mdns;
 
-// впишите сюда данные, соответствующие вашей сети:
 const char* ssid = "zloy_zyxel";
 const char* passw = "ROKOLABS2015!";
+const char* token = "123456";
+int blinkDelay = 3000;
+int serverCellDelay = 4000;
 
 ESP8266WebServer server(80);
 
@@ -139,13 +142,73 @@ void wifiInit(void)
 
   server.begin();
   Serial.println("HTTP server started");
+
+  
 }
 
 void wifiProcess(void) {
   server.handleClient();
+
+
+  if(WiFi.status() == WL_CONNECTED) {
+
+        HTTPClient http;
+
+        Serial.print("[HTTP] begin...\n");
+        // configure traged server and url
+        http.begin("http://sharaeebina.herokuapp.com/status?id=123456"); //HTTP
+
+        Serial.print("[HTTP] GET...\n");
+        // start connection and send HTTP header
+        int httpCode = http.GET();
+
+        // httpCode will be negative on error
+        if(httpCode > 0) {
+            // HTTP header has been send and Server response header has been handled
+            Serial.printf("[HTTP] GET... code: %d\n", httpCode);
+
+            // file found at server
+            if(httpCode == HTTP_CODE_OK) {
+                String payload = http.getString();
+                blink(payload.toInt());
+                Serial.println(payload);
+            }
+        } else {
+            Serial.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
+        }
+
+        http.end();
+
+        delay(serverCellDelay);
+    }
 }
 
+void blink(int data) {
+  bool needR = (data & 1 << 2) != 0;
+  bool needG = (data & 1 << 1) != 0;
+  bool needB = (data & 1 << 0) != 0;
+  
+  if (needR) {
+      digitalWrite(LedR, HIGH);
+      Serial.printf("R %d\n", data & 1 << 2);
+  }
 
+  if (needG) {
+      digitalWrite(LedG, HIGH);
+      Serial.printf("G %d\n", data & 1 << 1);
+  }
+
+  if (needB) {
+      digitalWrite(LedB, HIGH);
+      Serial.printf("B %d\n", data & 1 << 0);
+  }
+
+  delay(blinkDelay);
+
+  digitalWrite(LedR, LOW);
+  digitalWrite(LedG, LOW);
+  digitalWrite(LedB, LOW);
+}
 
 
 
