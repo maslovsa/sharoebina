@@ -12,7 +12,7 @@ int requestkDelay = 500;
 const char* ssid     = "zloy_zyxel";
 const char* password = "ROKOLABS2015!";
 char path[] = "/";
-char host[] = "100.72.183.7";
+char host[] = "https://sharaebina-node.herokuapp.com";
 
   
 WebSocketClient webSocketClient;
